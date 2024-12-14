@@ -3,12 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import osmnx as ox
 
-print("Setting up OSMNX...")
-
-place = "Bengaluru, Karnataka"
-G = ox.graph_from_place(place, network_type="drive")
-print(G)
-
 
 class Coordinates(BaseModel):
     lon: float
@@ -44,6 +38,8 @@ def read_root():
 @app.post('/paths')
 def find_path(location: Location):
     try:
+        place = "Bengaluru, Karnataka"
+        G = ox.graph_from_place(place, network_type="drive")
         origin_node = ox.distance.nearest_nodes(G, location.origin.lon, location.origin.lat)
         dest_node = ox.distance.nearest_nodes(G, location.destination.lon, location.destination.lat)
 
