@@ -1,4 +1,4 @@
-import { Dispatch, FormEvent, SetStateAction } from "react";
+import { Dispatch, SetStateAction } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -28,9 +28,7 @@ const locationSchema = z.object({
 
 type TFormSchema = z.infer<typeof locationSchema>;
 
-export function LocationSearch({
-  onCoordinatesChange,
-}: LocationSearchProps) {
+export function LocationSearch({ onCoordinatesChange }: LocationSearchProps) {
   const form = useForm<TFormSchema>({
     resolver: zodResolver(locationSchema),
     defaultValues: {
@@ -38,6 +36,14 @@ export function LocationSearch({
       destination: "",
     },
   });
+
+  async function reset() {
+    form.reset(form.formState.defaultValues, {
+      keepErrors: false,
+      keepDefaultValues: true,
+    });
+    onCoordinatesChange([]);
+  }
 
   async function onSubmit(values: TFormSchema) {
     const [originData, destData] = await Promise.all([
@@ -63,8 +69,7 @@ export function LocationSearch({
     });
 
     const data = await res.json();
-    console.log(data);
-    onCoordinatesChange(data.path)
+    onCoordinatesChange(data.path);
   }
 
   return (
@@ -99,6 +104,9 @@ export function LocationSearch({
         />
 
         <Button type="submit">Submit</Button>
+        <Button type="button" onClick={() => reset()}>
+          Reset
+        </Button>
       </form>
     </Form>
   );
