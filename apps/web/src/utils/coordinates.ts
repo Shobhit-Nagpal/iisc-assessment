@@ -20,3 +20,8 @@ export const MAX_BOUNDS = L.latLngBounds(
   Coordinates.SOUTH_WEST,
   Coordinates.NORTH_EAST,
 );
+
+export function normalizePath(path: number[][]) {
+  const normalizedPath = path.map((p) => L.latLng(p[0], p[1]))
+  return normalizedPath
+}
