@@ -1,3 +1,4 @@
 fastapi[standard]==0.113.0
 pydantic==2.8.0
-osmnx=2.0.0
+scikit-learn==1.6.0
+osmnx==2.0.0
