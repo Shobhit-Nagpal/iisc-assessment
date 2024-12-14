@@ -3,6 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import osmnx as ox
 
+print("Setting up OSMNX...")
+
 place = "Bengaluru, Karnataka"
 G = ox.graph_from_place(place, network_type="drive")
 print(G)
