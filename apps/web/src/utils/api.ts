@@ -1,12 +1,7 @@
-export const BASE_URL = "http://localhost:8000";
+const BASE_URL = import.meta.env.VITE_BASE_URL
 
-export type TApiRequest = {
-  origin: {
-    lon: number;
-    lat: number;
-  };
-  destination: {
-    lon: number;
-    lat: number;
-  };
-};
+if (!BASE_URL) {
+  throw new Error("Base url not found");
+}
+
+export { BASE_URL };

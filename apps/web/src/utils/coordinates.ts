@@ -1,4 +1,5 @@
 import L from "leaflet";
+import { BASE_URL } from "./api";
 
 const LAT_NORTH = 13.2827;
 const LAT_SOUTH = 12.6933;
@@ -22,6 +23,29 @@ export const MAX_BOUNDS = L.latLngBounds(
 );
 
 export function normalizePath(path: number[][]) {
-  const normalizedPath = path.map((p) => L.latLng(p[0], p[1]))
-  return normalizedPath
+  const normalizedPath = path.map((p) => L.latLng(p[0], p[1]));
+  return normalizedPath;
+}
+
+export async function getPath(
+  origin: { lon: number; lat: number },
+  destination: { lon: number; lat: number },
+) {
+  const res = await fetch(`${BASE_URL}/paths`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      origin: {
+        lon: origin.lon,
+        lat: origin.lat,
+      },
+      destination: {
+        lon: destination.lon,
+        lat: destination.lat,
+      },
+    }),
+  });
+  return await res.json();
 }
