@@ -31,6 +31,14 @@ export async function getPath(
   origin: { lon: number; lat: number },
   destination: { lon: number; lat: number },
 ) {
+
+  if (!isInBounds(origin)) {
+    throw new Error("Origin location is outside Bangalore city limits");
+  }
+  if (!isInBounds(destination)) {
+    throw new Error("Destination location is outside Bangalore city limits");
+  }
+
   const res = await fetch(`${BASE_URL}/paths`, {
     method: "POST",
     headers: {
@@ -48,4 +56,13 @@ export async function getPath(
     }),
   });
   return await res.json();
+}
+
+function isInBounds(point: { lat: number; lon: number }): boolean {
+  return (
+    point.lat >= LAT_SOUTH &&
+    point.lat <= LAT_NORTH &&
+    point.lon >= LONG_EAST &&
+    point.lon <= LONG_WEST
+  );
 }

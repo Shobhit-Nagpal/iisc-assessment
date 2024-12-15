@@ -13,6 +13,7 @@ import {
   MAX_BOUNDS,
   normalizePath,
 } from "@/utils/coordinates";
+import { useToast } from "@/hooks/use-toast";
 
 interface MapProps {
   mode: "input" | "click";
@@ -84,6 +85,7 @@ function LocationMarker({
   onCoordinatesChange,
   onAltCoordinatesChange,
 }: LocationMarkerProps) {
+  const { toast } = useToast();
   const [origin, setOrigin] = useState<[number, number] | null>(null);
   const [destination, setDestination] = useState<[number, number] | null>(null);
 
@@ -103,8 +105,10 @@ function LocationMarker({
           const allPaths = data.paths;
 
           if (allPaths.length === 0) {
-            //Show toast here
-            console.log("No paths found");
+            toast({
+              title: "No paths found",
+              variant: "destructive",
+            });
             return;
           }
 

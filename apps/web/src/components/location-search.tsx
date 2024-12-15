@@ -17,6 +17,7 @@ import { MaxWidthWrapper } from "./max-width-wrapper";
 import { Loader } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getPath } from "@/utils/coordinates";
+import { useToast } from "@/hooks/use-toast";
 
 interface LocationSearchProps {
   path: number[][];
@@ -44,6 +45,7 @@ export function LocationSearch({
   onCoordinatesChange,
   onAltCoordinatesChange,
 }: LocationSearchProps) {
+  const { toast } = useToast();
   const form = useForm<TFormSchema>({
     resolver: zodResolver(locationSchema),
     defaultValues: {
@@ -72,8 +74,10 @@ export function LocationSearch({
       const allPaths = data.paths;
 
       if (allPaths.length === 0) {
-        //Show toast here
-        console.log("No paths found");
+        toast({
+          title: "No paths found",
+          variant: "destructive",
+        });
         return;
       }
 
@@ -81,6 +85,11 @@ export function LocationSearch({
       onCoordinatesChange(shortestPath);
       onAltCoordinatesChange(allPaths);
     } catch (err) {
+      const error = err as Error;
+      toast({
+        title: error.message,
+        variant: "destructive",
+      });
     } finally {
       onLoading(false);
     }

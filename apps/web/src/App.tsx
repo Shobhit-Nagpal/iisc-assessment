@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Map } from "./components/map";
 import { LocationSearch } from "./components/location-search";
+import { Toaster } from "./components/ui/toaster";
 
 function App() {
   const [coords, setCoords] = useState<number[][]>([]);
@@ -11,17 +12,17 @@ function App() {
   return (
     <main className="min-h-screen flex flex-col">
       <div className="relative flex-1">
-        <Map 
+        <Map
           mode={mode}
-          path={coords} 
+          path={coords}
           onLoading={setLoading}
-          altPaths={altCoords} 
+          altPaths={altCoords}
           onCoordinatesChange={setCoords}
           onAltCoordinatesChange={setAltCoords}
         />
         <div className="absolute inset-x-0 top-0 z-[99999]">
           <LocationSearch
-            path={coords} 
+            path={coords}
             loading={loading}
             onLoading={setLoading}
             onModeChange={setMode}
@@ -30,6 +31,7 @@ function App() {
           />
         </div>
       </div>
+      <Toaster />
     </main>
   );
 }
