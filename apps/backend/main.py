@@ -21,7 +21,7 @@ app = FastAPI()
 
 origins = [
     "http://localhost:5173",
-    "https://iisc-assessment.vercel.app/",
+    "https://iisc-assessment.vercel.app",
 ]
 
 app.add_middleware(
@@ -44,11 +44,8 @@ def find_path(location: Location):
         origin_node = ox.distance.nearest_nodes(G, location.origin.lon, location.origin.lat)
         dest_node = ox.distance.nearest_nodes(G, location.destination.lon, location.destination.lat)
 
-        # Get the shortest path nodes
-        path_nodes = ox.routing.shortest_path(G, origin_node, dest_node, weight="length")
+        # Get the shortest paths nodes
         k_path_nodes = ox.routing.k_shortest_paths(G, origin_node, dest_node, 3, weight="length")
-
-        path_c = [[G.nodes[node]['y'], G.nodes[node]['x']] for node in path_nodes]
 
         all_paths = []
         for path in k_path_nodes:
