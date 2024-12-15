@@ -1,8 +1,9 @@
-import { Dispatch, SetStateAction, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useRef } from "react";
 import {
   MapContainer,
   Marker,
   Polyline,
+  Popup,
   TileLayer,
   useMapEvents,
 } from "react-leaflet";
@@ -18,19 +19,27 @@ import { useToast } from "@/hooks/use-toast";
 interface MapProps {
   mode: "input" | "click";
   path: number[][];
+  origin: [number, number] | null;
+  destination: [number, number] | null;
   altPaths: number[][][];
   onLoading: Dispatch<SetStateAction<boolean>>;
   onCoordinatesChange: Dispatch<SetStateAction<number[][]>>;
   onAltCoordinatesChange: Dispatch<SetStateAction<number[][][]>>;
+  onOriginChange: Dispatch<SetStateAction<[number, number] | null>>;
+  onDestinationChange: Dispatch<SetStateAction<[number, number] | null>>;
 }
 
 export function Map({
   mode,
   path,
   altPaths,
+  origin,
+  destination,
   onLoading,
   onCoordinatesChange,
   onAltCoordinatesChange,
+  onOriginChange,
+  onDestinationChange,
 }: MapProps) {
   const mapRef = useRef(null);
   const N_path = normalizePath(path);
@@ -56,6 +65,10 @@ export function Map({
           onLoading={onLoading}
           onCoordinatesChange={onCoordinatesChange}
           onAltCoordinatesChange={onAltCoordinatesChange}
+          onDestinationChange={onDestinationChange}
+          onOriginChange={onOriginChange}
+          origin={origin}
+          destination={destination}
         />
       )}
       {altPaths.length > 0 &&
@@ -78,16 +91,22 @@ interface LocationMarkerProps {
   onLoading: Dispatch<SetStateAction<boolean>>;
   onCoordinatesChange: Dispatch<SetStateAction<number[][]>>;
   onAltCoordinatesChange: Dispatch<SetStateAction<number[][][]>>;
+  onOriginChange: Dispatch<SetStateAction<[number, number] | null>>;
+  onDestinationChange: Dispatch<SetStateAction<[number, number] | null>>;
+  origin: [number, number] | null;
+  destination: [number, number] | null;
 }
 
 function LocationMarker({
+  origin,
+  destination,
   onLoading,
   onCoordinatesChange,
   onAltCoordinatesChange,
+  onOriginChange,
+  onDestinationChange,
 }: LocationMarkerProps) {
   const { toast } = useToast();
-  const [origin, setOrigin] = useState<[number, number] | null>(null);
-  const [destination, setDestination] = useState<[number, number] | null>(null);
 
   useMapEvents({
     async click(e) {
@@ -95,9 +114,9 @@ function LocationMarker({
         onLoading(true);
         const { lat, lng } = e.latlng;
         if (!origin) {
-          setOrigin([lat, lng]);
+          onOriginChange([lat, lng]);
         } else if (!destination) {
-          setDestination([lat, lng]);
+          onDestinationChange([lat, lng]);
           const data = await getPath(
             { lat: origin[0], lon: origin[1] },
             { lat: lat, lon: lng },
@@ -117,8 +136,11 @@ function LocationMarker({
           onAltCoordinatesChange(allPaths);
         }
       } catch (err) {
-        //Show toast
-        console.error(err);
+        const error = err as Error;
+        toast({
+          title: error.message,
+          variant: "destructive",
+        });
       } finally {
         onLoading(false);
       }
@@ -129,12 +151,12 @@ function LocationMarker({
     <>
       {origin && (
         <Marker position={origin}>
-          {/* You can add a popup here if needed */}
+          <Popup>Origin</Popup>
         </Marker>
       )}
       {destination && (
         <Marker position={destination}>
-          {/* You can add a popup here if needed */}
+          <Popup>Destination</Popup>
         </Marker>
       )}
     </>
