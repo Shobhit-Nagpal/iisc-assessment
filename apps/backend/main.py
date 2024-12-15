@@ -3,6 +3,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import osmnx as ox
 
+place = "Bengaluru, Karnataka"
+G = ox.graph_from_place(place, network_type="drive")
+
 
 class Coordinates(BaseModel):
     lon: float
@@ -38,19 +41,24 @@ def read_root():
 @app.post('/paths')
 def find_path(location: Location):
     try:
-        place = "Bengaluru, Karnataka"
-        G = ox.graph_from_place(place, network_type="drive")
         origin_node = ox.distance.nearest_nodes(G, location.origin.lon, location.origin.lat)
         dest_node = ox.distance.nearest_nodes(G, location.destination.lon, location.destination.lat)
 
         # Get the shortest path nodes
         path_nodes = ox.routing.shortest_path(G, origin_node, dest_node, weight="length")
+        k_path_nodes = ox.routing.k_shortest_paths(G, origin_node, dest_node, 3, weight="length")
+
+        path_c = [[G.nodes[node]['y'], G.nodes[node]['x']] for node in path_nodes]
+
+        all_paths = []
+        for path in k_path_nodes:
+            path_coords = [[G.nodes[node]['y'], G.nodes[node]['x']] for node in path]
+            all_paths.append(path_coords)
 
         # Convert node IDs to coordinates
-        path_coords = [[G.nodes[node]['y'], G.nodes[node]['x']] for node in path_nodes]
 
         return {
-            "path": path_coords
+            "paths": all_paths
         }
     except Exception as e:
         raise HTTPException(
