@@ -87,7 +87,7 @@ function LocationMarker({
   const [origin, setOrigin] = useState<[number, number] | null>(null);
   const [destination, setDestination] = useState<[number, number] | null>(null);
 
-  const map = useMapEvents({
+  useMapEvents({
     async click(e) {
       try {
         onLoading(true);
